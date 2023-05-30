@@ -1,0 +1,19 @@
+{
+  "name": "webapphealthchecker",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express4-tedious": "^0.3.0",
+    "mssql": "^9.1.1",
+    "require": "^0.4.4"
+  },
+  "devDependencies": {},
+  "description": ""
+}

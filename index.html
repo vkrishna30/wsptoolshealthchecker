@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>WSP Autodesk Tools Health Dashboard</title>
+      <style>
+         body {
+         font-family: Arial, sans-serif;
+         }
+         .container {
+         text-align: center;
+         margin-top: 50px;
+         }
+         h1 {
+         margin-bottom: 30px;
+         color: rgb(255, 0, 0);
+         }
+         table {
+         margin: 0 auto;
+         border-collapse: collapse;
+         width: 80%;
+         }
+         th {
+         background-color: #f2f2f2;
+         text-align: center;
+         padding: 8px;
+         }
+         td {
+         padding: 8px;
+         border-bottom: 1px solid #ddd;
+         text-align: center;
+         }
+         tr:nth-child(even) {
+         background-color: #f9f9f9;
+         }
+         #chart-container {
+         width: 80%;
+         margin: 0 auto;
+         display: flex;
+         justify-content: space-between;
+         align-items: flex-start;
+         margin-top: 50px;
+         }
+         .chart {
+         width: 45%;
+         height: 300px;
+         }
+      </style>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>      
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+   <body>
+      <div class="container">
+         <h1>WSP Autodesk Tools Health Dashboard</h1>
+         <table id="data-table">
+            <thead>
+               <tr>
+                  <th>Process Name</th>
+                  <th>Process ID</th>
+                  <th>Max Idle Time</th>
+                  <th>Machine Name</th>
+                  <th>Process Title</th>
+                  <th>User Name</th>
+               </tr>
+            </thead>
+            <tbody></tbody>
+         </table>
+         <div id="chart-container">
+            <div class="chart">
+               <canvas id="bar-chart"></canvas>
+               <h2>Max Idle Time Bar Chart</h2>
+            </div>
+            <div class="chart">
+               <canvas id="pie-chart"></canvas>
+               <h2>Max Idle Time Distribution</h2>
+            </div>
+         </div>
+      </div>     
+      <script>
+            // Check if the viewport meta element is already present
+          var viewportMeta = document.querySelector('meta[name="viewport"]');
+          if (!viewportMeta) {
+            // If not present, create and append the viewport meta element
+            viewportMeta = document.createElement('meta');
+            viewportMeta.name = 'viewport';
+            viewportMeta.content = 'width=device-width, initial-scale=1.0';
+            document.head.appendChild(viewportMeta);
+          }
+
+         // Get the chart canvas elements
+         const barChartCanvas = document.getElementById('bar-chart');
+         const pieChartCanvas = document.getElementById('pie-chart');
+         
+         // Fetch data from the API endpoint
+         //fetch('http://localhost:3000/api/data')         
+         fetch('https://wsptoolchecker.azurewebsites.net/api/data')
+           .then(response => response.json())
+           .then(data => {
+             // Generate the table rows dynamically
+             const tableBody = document.querySelector('#data-table tbody');
+             data.forEach(rowData => {
+               const row = document.createElement('tr');
+               Object.values(rowData).forEach(value => {
+                 const cell = document.createElement('td');
+                 cell.textContent = value;
+                 row.appendChild(cell);
+               });
+               tableBody.appendChild(row);
+             });            
+         
+             // Generate the charts
+             const labels = data.map(row => row.ProcessName);
+             const maxIdleTimes = data.map(row => row.MaxIdleTime);
+         
+             new Chart(barChartCanvas, {
+               type: 'bar',
+               data: {
+                 labels: labels,
+                 datasets: [{
+                   label: 'Max Idle Time',
+                   data: maxIdleTimes,
+                   backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                   borderColor: 'rgba(75, 192, 192, 1)',
+                   borderWidth: 1
+                 }]
+               },
+               options: {
+                 responsive: true,
+                 scales: {
+                   x: {
+                     grid: {
+                       display: false
+                     },
+                     ticks: {
+                       beginAtZero: true
+                     }
+                   },
+                   y: {
+                     grid: {
+                       drawBorder: false
+                     },
+                     ticks: {
+                       beginAtZero: true
+                     }
+                   }
+                 },
+                 plugins: {
+                   legend: {
+                     display: false
+                   },
+                   title: {
+                     display: true,
+                     text: 'Max Idle Time Bar Chart',
+                     font: {
+                       size: 16,
+                       weight: 'bold'
+                     }
+                   }
+                 }
+               }
+             });
+         
+             new Chart(pieChartCanvas, {
+               type: 'pie',
+               data: {
+                 labels: labels,
+                 datasets: [{
+                   label: 'Max Idle Time',
+                   data: maxIdleTimes,
+                   backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+                   borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                   borderWidth: 1
+                 }]
+               },
+               options: {
+                 responsive: true,
+                 plugins: {
+                   legend: {
+                     position: 'right'
+                   },
+                   title: {
+                     display: true,
+                     text: 'Max Idle Time Distribution',
+                     font: {
+                       size: 16,
+                       weight: 'bold'
+                     }
+                   }
+                 }
+               }
+             });
+           })           
+           .catch(error => {
+             console.log(error);
+             // Handle error if data fetch fails
+           });
+      </script>
+   </body>
+</html>
