@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 app.get('/api/data', async (req, res) => {
    try {
       await mssql.connect(config);
-      const result = await mssql.query('SELECT ProcessName, ProcessId, MaxIdleTime, MachineName, ProcessTitle, UserName FROM Autodesk_Health');
+      const result = await mssql.query('SELECT ProcessName, ProcessId, MaxIdleTime, MachineName, ProcessTitle, UserName, CreatedDate FROM Autodesk_Health');
       res.json(result.recordset);
    } catch (error) {
       console.error(error);
